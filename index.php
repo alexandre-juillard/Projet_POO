@@ -2,9 +2,7 @@
 
 require_once 'Autoloader.php';
 
-use App\Db\Db;
 use App\Autoloader;
+use App\Models\Postes;
 
 Autoloader::register();
-
-Db::getInstance();

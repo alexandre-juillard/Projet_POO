@@ -3,7 +3,6 @@
 namespace App\Db;
 
 use PDO;
-use Exception;
 use PDOException;
 
 class Db extends PDO
