@@ -11,7 +11,7 @@ class Db extends PDO
     public const DB_HOST = 'mvcdebutexo-db-1';
     public const DB_USER = 'root';
     public const DB_PASSWORD = 'root';
-    public const DB_NAME = "demo_mvc";
+    public const DB_NAME = "demo_mvc_esgi";
 
     // l'instance de la connexion en Base de donnée
     private static ?Db $instance = null;
