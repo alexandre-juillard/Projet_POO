@@ -41,10 +41,17 @@ class SecurityController extends Controller
                         ->setPassword($password)
                         ->create();
 
+                    $this->addFlash('success', 'Vous êtes bien inscrit à l\'application');
                     header("Location: /login");
                     exit();
+                } else {
+                    $this->addFlash('danger', 'Email déjà utilisé');
                 }
+            } else {
+                $this->addFlash('danger', 'Email invalide');
             }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->addFlash('danger', 'Formulaire incomplet');
         }
 
         $this->render('Security/register.php', [

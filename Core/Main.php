@@ -22,6 +22,8 @@ class Main
             exit();
         }
 
+        session_start();
+
         $this->router->initRouter();
 
         $this->router->handleRequest($uri, $_SERVER['REQUEST_METHOD']);

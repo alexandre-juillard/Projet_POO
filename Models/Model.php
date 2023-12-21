@@ -78,7 +78,7 @@ abstract class Model extends Db
 
         // On boucle sur l'objet
         foreach ($this as $key => $value) {
-            if ($key !== 'table' && $value !== null) {
+            if ($key !== 'table' && $value !== null && $key !== 'db') {
                 $champs[] = $key;
                 $markers[] = ":$key";
 
@@ -103,7 +103,7 @@ abstract class Model extends Db
         $valeurs = [];
 
         foreach ($this as $key => $value) {
-            if ($key !== 'table' && $value !== null && $key !== 'id') {
+            if ($key !== 'table' && $value !== null && $key !== 'id' && $key !== 'db') {
                 $champs[] = "$key = :$key";
 
                 if ($value instanceof DateTime) {

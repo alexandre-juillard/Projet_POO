@@ -16,4 +16,9 @@ abstract class Controller
 
         require_once ROOT . '/Views/base.php';
     }
+
+    public function addFlash(string $type, string $message): void
+    {
+        $_SESSION['flash'][$type] = $message;
+    }
 }

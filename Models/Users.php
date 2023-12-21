@@ -17,7 +17,7 @@ class Users extends Model
     public function findOneByEmail(string $email): self|bool
     {
         return $this->hydrateObject(
-            $this->runQuery('SELECT * FROM $this->table WHERE email = :email', ['email' => $email])->fetch()
+            $this->runQuery("SELECT * FROM $this->table WHERE email = :email", ['email' => $email])->fetch()
         );
     }
 
