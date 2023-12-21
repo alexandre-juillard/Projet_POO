@@ -8,6 +8,12 @@ abstract class Controller
     {
         extract($data);
 
-        include_once ROOT . '/Views/' . $path;
+        ob_start();
+
+        require_once ROOT . '/Views/' . $path;
+
+        $contenu = ob_get_clean();
+
+        require_once ROOT . '/Views/base.php';
     }
 }
