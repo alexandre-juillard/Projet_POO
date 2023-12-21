@@ -14,6 +14,16 @@ class Users extends Model
         $this->table = 'users';
     }
 
+    public function loggedUser(): void
+    {
+        $_SESSION['LOGGED_USER'] = [
+            'id' => $this->id,
+            'email' => $this->email,
+            'prenom' => $this->prenom,
+            'nom' => $this->nom,
+        ];
+    }
+
     public function findOneByEmail(string $email): self|bool
     {
         return $this->hydrateObject(

@@ -15,9 +15,36 @@ class SecurityController extends Controller
     {
         $form = new LoginForm();
 
+        if ($form::validate($_POST, ['email', 'password'])) {
+            $user = (new Users)->findOneByEmail($_POST['email']);
+
+            if ($user && password_verify($_POST['password'], $user->getPassword())) {
+                // On peut connecté le user
+                $user->loggedUser();
+
+                header("Location: /");
+                exit();
+            } else {
+                $this->addFlash('danger', 'Identifiants invalides');
+            }
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->addFlash('danger', 'formulaire incomplet');
+        }
+
         $this->render('Security/login.php', [
             'form' => $form->createForm()
         ]);
+    }
+
+    #[Route('/logout', 'app.logout', ['GET'])]
+    public function logout(): void
+    {
+        unset($_SESSION['LOGGED_USER']);
+
+        $url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/';
+
+        header('Location: ' . $url);
+        exit();
     }
 
     #[Route('/register', 'app.register', ['GET', 'POST'])]
