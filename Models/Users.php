@@ -14,6 +14,13 @@ class Users extends Model
         $this->table = 'users';
     }
 
+    public function findOneByEmail(string $email): self|bool
+    {
+        return $this->hydrateObject(
+            $this->runQuery('SELECT * FROM $this->table WHERE email = :email', ['email' => $email])->fetch()
+        );
+    }
+
     /**
      * Get the value of id
      *
@@ -84,6 +91,11 @@ class Users extends Model
         $this->prenom = $prenom;
 
         return $this;
+    }
+
+    public function getFullName(): string
+    {
+        return  "$this->nom $this->prenom";
     }
 
     /**
