@@ -3,12 +3,18 @@
 namespace App\Controllers\Frontend;
 
 use App\Core\Route;
+use App\Models\Postes;
+use App\Core\Controller;
 
-class HomeController
+class HomeController extends Controller
 {
     #[Route('/', 'homepage', ['GET'])]
     public function home(): void
     {
-        echo "Page d'accueil";
+        $postes = (new Postes())->findAll();
+
+        $this->render('Frontend/Home/index.php', [
+            'postes' => $postes
+        ]);
     }
 }

@@ -21,18 +21,22 @@ abstract class Model extends Db
      */
     public function findAll(): array
     {
-        return $this->runQuery('SELECT * FROM ' . $this->table)->fetchAll();
+        return $this->hydrateObject(
+            $this->runQuery('SELECT * FROM ' . $this->table)->fetchAll()
+        );
     }
 
     /**
      * Méthode de recherche par id
      *
      * @param integer $id
-     * @return array
+     * @return array|bool
      */
-    public function find(int $id): array
+    public function find(int $id): object|bool
     {
-        return $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch();
+        return $this->hydrateObject(
+            $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch()
+        );
     }
 
     /**
@@ -56,7 +60,9 @@ abstract class Model extends Db
         $champs = implode(' AND ', $champs);
 
         // On exécute la requete sql en lui passant les attributs
-        return $this->runQuery("SELECT * FROM $this->table WHERE $champs", $valeurs)->fetchAll();
+        return $this->hydrateObject(
+            $this->runQuery("SELECT * FROM $this->table WHERE $champs", $valeurs)->fetchAll()
+        );
     }
 
     public function create(): PDOStatement|bool
@@ -122,7 +128,7 @@ abstract class Model extends Db
         return $this->runQuery("DELETE FROM $this->table WHERE id = :id", ['id' => $this->id]);
     }
 
-    public function hydrate(array $data): static
+    public function hydrate(array|object $data): static
     {
         foreach ($data as $key => $value) {
             $setter = 'set' . ucfirst($key);
@@ -134,6 +140,21 @@ abstract class Model extends Db
         }
 
         return $this;
+    }
+
+    public function hydrateObject(mixed $query): array|static|bool
+    {
+        if (is_array($query) && count($query) > 0) {
+            $data = array_map(function (mixed $value): static {
+                return (new static)->hydrate($value);
+            }, $query);
+
+            return $data;
+        } elseif (!empty($query)) {
+            return (new  static)->hydrate($query);
+        } else {
+            return $query;
+        }
     }
 
     /**
