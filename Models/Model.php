@@ -2,183 +2,203 @@
 
 namespace App\Models;
 
-use DateTime;
-use App\Core\Db;
+use App\Db\Db;
 use PDOStatement;
 
 abstract class Model extends Db
 {
-    public function __construct(
-        protected ?string $table = null,
-        protected ?Db $db = null,
-    ) {
-    }
+    /**
+     * Va stocker le nom de la table sur laquelle on travaille
+     *
+     * @var string|null
+     */
+    protected ?string $table = null;
 
     /**
-     * Méthode pour récupérer toutes les entrées d'un table
+     * Va stocker l'instance de connexion en bdd
+     *
+     * @var Db|null
+     */
+    protected ?Db $database = null;
+
+    /**
+     * fct pour recuperer les entrées d'une table
      *
      * @return array
      */
     public function findAll(): array
     {
-        return $this->hydrateObject(
-            $this->runQuery('SELECT * FROM ' . $this->table)->fetchAll()
-        );
-    }
+        return $this->runQuery("SELECT * FROM $this->table")->fetchAll();
+    }   
 
     /**
-     * Méthode de recherche par id
+     * fct pour chercher une entrée par son id
      *
      * @param integer $id
-     * @return array|bool
+     * @return array/boolean
      */
-    public function find(int $id): object|bool
+    public function find(int $id): array|bool
     {
-        return $this->hydrateObject(
-            $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch()
-        );
+        return $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch();
     }
 
     /**
-     * Méthode pour chercher des entrées avec un tableau de filtre
+     * fct pour rechercher une entrée avec filtre
      *
      * @param array $filters
      * @return array
      */
     public function findBy(array $filters): array
     {
+        // champs va stocker les clés et son marqueur, valeurs va stocker la valeur de la clé
         $champs = [];
         $valeurs = [];
 
-        // On boucle sur le tableau de filtre pour peupler les tableaux
-        foreach ($filters as $key => $filter) {
+        //Faire une boucle sur tableau de filtre
+        foreach($filters as $key =>$value) {
             $champs[] = "$key = :$key";
-            $valeurs[$key] = $filter;
+            $valeurs[$key] = $value;
         }
 
-        // On transforme le tableau champs en chaîne  de caractère
-        $champs = implode(' AND ', $champs);
+        //transforme les champs en une seule chaine qui sera integrer dans la requete
+        $strChamp = implode(' AND ', $champs);
 
-        // On exécute la requete sql en lui passant les attributs
-        return $this->hydrateObject(
-            $this->runQuery("SELECT * FROM $this->table WHERE $champs", $valeurs)->fetchAll()
-        );
+        return $this->runQuery("SELECT * FROM $this->table WHERE $strChamp", $valeurs)->fetchAll();
     }
 
+    /**
+     * fct pour créer 
+     *
+     * @return PDOStatement|boolean
+     */
     public function create(): PDOStatement|bool
     {
-        // La requete que nous devons créer :
-        // INSERT INTO poste (titre, description, actif) VALUES (:titre, :description, :actif)
-        // [:titre, :description, :actif]
-        // ['titre' => 'Le titre']
-
+        //INSERT INTO $this->table(nom, prenom, email, password, roles) VALUES (:nom, :prenom, :email, :password, :roles)
         $champs = [];
         $markers = [];
         $valeurs = [];
 
-        // On boucle sur l'objet
-        foreach ($this as $key => $value) {
-            if ($key !== 'table' && $value !== null && $key !== 'db') {
-                $champs[] = $key;
+        foreach($this as $key => $value){
+            //filtre les infos qu'on récupère, enleve la table et database et valeurs non remplies
+            if($key != 'table' && $key != 'database' && !empty($value)) {
+            
+                //stocke les infos dans variables sous forme de tableau
+                $champs[] = "$key";
                 $markers[] = ":$key";
 
-                if ($value instanceof DateTime) {
-                    $valeurs[$key] = date_format($value, 'Y-m-d H:i:s');
+                //si $value est un tableau, on transforme en json pour etre lu par bdd
+                if(is_array($value))
+                {
+                    $valeurs[$key] = json_encode($value);
+
                 } else {
                     $valeurs[$key] = $value;
                 }
+                
             }
         }
-
-        $champs = implode(', ', $champs);
-        $markers = implode(', ', $markers);
-
-        return $this->runQuery("INSERT INTO $this->table ($champs) VALUES ($markers)", $valeurs);
-    }
-
-    public function update(): PDOStatement|bool
-    {
-        // UPDATE postes SET titre=:titre WHERE id = :id
-        $champs = [];
-        $valeurs = [];
-
-        foreach ($this as $key => $value) {
-            if ($key !== 'table' && $value !== null && $key !== 'id' && $key !== 'db') {
-                $champs[] = "$key = :$key";
-
-                if ($value instanceof DateTime) {
-                    $valeurs[$key] = date_format($value, 'Y-m-d H:i:s');
-                } else {
-                    $valeurs[$key] = $value;
-                }
-            }
-        }
-
-        $champs = implode(', ', $champs);
-
-        /** @var Postes $this */
-        $valeurs['id'] = $this->id;
-
-        return $this->runQuery("UPDATE $this->table SET $champs WHERE id = :id", $valeurs);
-    }
-
-    public function delete(): PDOStatement|bool
-    {
-        /** @var Postes $this */
-        return $this->runQuery("DELETE FROM $this->table WHERE id = :id", ['id' => $this->id]);
-    }
-
-    public function hydrate(array|object $data): static
-    {
-        foreach ($data as $key => $value) {
-            $setter = 'set' . ucfirst($key);
-
-            // On vérfie si le setter existe
-            if (method_exists($this, $setter)) {
-                $this->$setter($value);
-            }
-        }
-
-        return $this;
-    }
-
-    public function hydrateObject(mixed $query): array|static|bool
-    {
-        if (is_array($query) && count($query) > 0) {
-            $data = array_map(function (mixed $value): static {
-                return (new static)->hydrate($value);
-            }, $query);
-
-            return $data;
-        } elseif (!empty($query)) {
-            return (new  static)->hydrate($query);
-        } else {
-            return $query;
-        }
+        // transforme infos de tableau en une seule chaine
+        $strChamp = implode(', ', $champs);
+        $strMarker = implode(', ', $markers);
+       
+        return $this->runQuery("INSERT INTO $this->table($strChamp) VALUES ($strMarker)", $valeurs);  
     }
 
     /**
-     * Methode pour éxecuter les requêtes sql
+     * fct pour mettre a jour une table
      *
-     * @param string $sql
-     * @param array $attributs
      * @return PDOStatement|boolean
      */
-    protected function runQuery(string $sql, array $attributs = []): PDOStatement|bool
+    public function update(): PDOStatement|bool
     {
-        // Récupérer notre instance de Db
-        $this->db = Db::getInstance();
+        //UPDATE $this->table SET nom = :nom, prenom = :prenom WHERE id = :id
+        
+        $champs = [];
+        $valeurs = [];
 
-        // On vérifie s'il y a des attributs
-        if ($attributs !== null) {
-            // Requête préparée
-            $query = $this->db->prepare($sql);
-            $query->execute($attributs);
+        foreach($this as $key => $value) {
+            if($key != 'table' && $key != 'database' && $key != 'id' && !empty($value) ) {
+                $champs[] = "$key = :$key";
+                
+                if(is_array($value))
+                {
+                    $valeurs[$key] = json_encode($value);
 
-            return $query;
-        } else {
-            // Requête simple
-            return $this->db->query($sql);
+                } else {
+                    $valeurs[$key] = $value;
+                }
+            }     
         }
+        //commentaire qui indique a vscode d'ou vient id car il existe pas dans classe Model
+        /**
+         * @var User $this
+         */
+        $valeurs['id'] = $this->id;
+
+        $strChamp = implode(',', $champs);
+        return $this->runQuery("UPDATE $this->table SET $strChamp WHERE id = :id", $valeurs);
+
     }
+
+    /**
+     * fct pour delete 
+     *
+     * @return PDOStatement|boolean
+     */
+    public function delete(): PDOStatement|bool
+    {
+        //DELETE FROM $this->table WHERE id= :id
+        /**
+         * @var User $this
+         */
+        return $this->runQuery("DELETE FROM $this->table WHERE id = :id", ['id' => $this->id]);
+    }
+    /**
+     * fonction pour executer n'importe quelle requete SQL
+     *
+     * @param string $sql
+     * @param array $params
+     * @return PDOStatement|boolean
+     */
+    protected function runQuery(string $sql, array $params = []): PDOStatement|bool
+    {
+        //on recupere l'instance de Db
+        $this->database = Db::getInstance();
+
+        if (!empty($params)) {
+            //je suis dans une requete préparée
+            $query = $this->database->prepare($sql);
+            $query->execute($params);
+        } else {
+            //requete simple
+            $query = $this->database->query($sql);
+        }
+
+        return $query;
+    }
+
+   
+
+    /**
+     * fct qui prerempli les données sous forme d'objet pour automatiser apport de données(evite d ecrire les setter)
+     *
+     * @param array|object $data
+     * @return static
+     */
+    public function hydrate(array|object $data): static
+    {
+        //automatisation des setter dynamiquement (nom devient setNom($value)), transforme un tableau en objet
+        foreach($data as $key => $value) {
+            $setter = 'set' . ucfirst($key);
+
+            //patch pour faire fct meme si roles est vide
+            if($key === 'roles'){
+                $this->$setter($value ? json_decode($value) : null);
+            } else {
+                $this->$setter($value);
+            } 
+        }
+        return $this;
+    }
+    
 }

@@ -1,1 +1,0 @@
-<h1>Page admin postes</h1>
