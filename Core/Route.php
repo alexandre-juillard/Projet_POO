@@ -14,8 +14,7 @@ class Route
         private ?string $controller = null,
         private ?string $action = null,
     )
-    {
-        
+    {       
     }
 
         /**
