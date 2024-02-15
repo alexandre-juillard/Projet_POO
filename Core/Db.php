@@ -2,7 +2,7 @@
 
 //fichier de la classe Db
 //l'instance de Db va permettre la connexion a la bdd
-namespace App\Db;
+namespace App\Core;
 
 use PDO;
 use PDOException;

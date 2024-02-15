@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Db\Db;
+use App\Core\Db;
 use PDOStatement;
 
 abstract class Model extends Db
