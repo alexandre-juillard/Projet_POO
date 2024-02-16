@@ -18,6 +18,24 @@ class User extends Model
         $this->table = "users";
     }
 
+    public function findOneByEmail(string $email): array|bool
+    {
+        return $this->runQuery("SELECT * FROM $this->table WHERE email = :email", ['email' => $email])->fetch();;
+    }
+
+    public function connect(): self
+    {
+        $_SESSION['LOGGED_USER'] = [
+                'id' => $this->id,
+                'email' => $this->email,
+                'nom' => $this->nom,
+                'prenom' => $this->prenom,
+                'roles' => $this->roles
+        ];
+
+        return $this;
+    }
+
         /**
          * Get the value of password
          *

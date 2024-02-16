@@ -4,8 +4,8 @@ namespace App\Controllers\Frontend;
 
 //ce use importe la classe Route créer dans dossier Core
 
-use App\Core\Controller;
 use App\Core\Route;
+use App\Core\Controller;
 
 class HomeController extends Controller
 {
@@ -19,17 +19,5 @@ class HomeController extends Controller
                 'title' => 'Homepage',
             ]
         ]);
-    }
-
-    #[Route('test', '/test', ['GET'])]
-    public function test(): void
-    {
-        echo 'Coucou cette page est un test!';
-    }
-
-    #[Route('debut', '/debut', ['GET'])]
-    public function debut(): void
-    {
-        echo 'Debut de page pour une nouvelle application web';
     }
 }

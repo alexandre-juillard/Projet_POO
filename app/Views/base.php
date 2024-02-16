@@ -8,10 +8,12 @@
 </head>
 <body>
     <header>
-        HEADER
+        <?php include_once ROOT . '/Views/Layout/header.php'; ?>
+        
     </header>
 
     <main>
+        <?php include_once ROOT . '/Views/Layout/message.php'; ?>
         <?= $content; ?>
 
     </main>

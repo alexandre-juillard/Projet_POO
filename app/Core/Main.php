@@ -12,6 +12,8 @@ class Main
     }
     public function start(): void
     {
+        session_start();
+
         $uri = $_GET['q'];
 
         //on verifie le trailing /
@@ -55,13 +57,13 @@ class Main
         foreach ($classes as $class) {
             //pour chaque classe on recupere la methode dans un tableau
             $methodes = get_class_methods($class);
-            
+
             //on boucle sur les methodes de la classe
-            foreach($methodes as $methode){
+            foreach ($methodes as $methode) {
                 //on recupere attributs php 8 pour chaque methode
                 $attributs = (new \ReflectionMethod($class, $methode))->getAttributes(Route::class);
 
-                foreach($attributs as $attribut){
+                foreach ($attributs as $attribut) {
                     //on cree une instance de la classe Route avec infos de attribut php8
                     $route = $attribut->newInstance();
 
