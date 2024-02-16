@@ -16,4 +16,16 @@ abstract class Controller
 
         require_once ROOT . '/Views/base.php';
     }
+
+    protected function isAdmin(): void
+    {
+        if(!isset($_SESSION['LOGGED_USER']) || 
+        !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
+            $_SESSION['messages']['danger'] = "Vous n'avez pas les droits pour cette page";
+
+            http_response_code(302);
+            header('Location: /login');
+            exit();
+        }
+    }
 }

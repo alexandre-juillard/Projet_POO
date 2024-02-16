@@ -20,8 +20,6 @@ class SecurityController extends Controller
 
             if ($user && password_verify($_POST['password'], $user['password'])) {
 
-                $user = (new User)->hydrate($user);
-
                 $user->connect();
 
                 http_response_code(302);

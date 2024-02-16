@@ -6,35 +6,36 @@ use App\Models\Model;
 
 class User extends Model
 {
-    public function __construct(
-        protected ?int $id = null,
-        protected ?string $nom = null,
-        protected ?string $prenom = null,
-        protected ?string $email = null,
-        protected ?string $password = null,
-        protected ?array $roles = null,
-    )
-    {
-        $this->table = "users";
-    }
+        public function __construct(
+                protected ?int $id = null,
+                protected ?string $nom = null,
+                protected ?string $prenom = null,
+                protected ?string $email = null,
+                protected ?string $password = null,
+                protected ?array $roles = null,
+        ) {
+                $this->table = "users";
+        }
 
-    public function findOneByEmail(string $email): array|bool
-    {
-        return $this->runQuery("SELECT * FROM $this->table WHERE email = :email", ['email' => $email])->fetch();;
-    }
+        public function findOneByEmail(string $email): static|bool
+        {
+                return $this->fetchHydrate(
+                        $this->runQuery("SELECT * FROM $this->table WHERE email = :email", ['email' => $email])->fetch()
+                );
+        }
 
-    public function connect(): self
-    {
-        $_SESSION['LOGGED_USER'] = [
-                'id' => $this->id,
-                'email' => $this->email,
-                'nom' => $this->nom,
-                'prenom' => $this->prenom,
-                'roles' => $this->roles
-        ];
+        public function connect(): self
+        {
+                $_SESSION['LOGGED_USER'] = [
+                        'id' => $this->id,
+                        'email' => $this->email,
+                        'nom' => $this->nom,
+                        'prenom' => $this->prenom,
+                        'roles' => $this->getRoles(),
+                ];
 
-        return $this;
-    }
+                return $this;
+        }
 
         /**
          * Get the value of password
@@ -159,11 +160,13 @@ class User extends Model
         /**
          * Get the value of roles
          *
-         * @return ?array
+         * @return array
          */
-        public function getRoles(): ?array
+        public function getRoles(): array
         {
-                return $this->roles;
+                $this->roles[] = 'ROLE_USER';
+
+                return array_unique($this->roles);
         }
 
         /**

@@ -28,18 +28,22 @@ abstract class Model extends Db
      */
     public function findAll(): array
     {
-        return $this->runQuery("SELECT * FROM $this->table")->fetchAll();
+        return $this->fetchHydrate(
+            $this->runQuery("SELECT * FROM $this->table")->fetchAll());
+        
     }   
 
     /**
      * fct pour chercher une entrée par son id
      *
      * @param integer $id
-     * @return array/boolean
+     * @return static/boolean
      */
-    public function find(int $id): array|bool
+    public function find(int $id): static|bool
     {
-        return $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch();
+        return $this->fetchHydrate(
+            $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch());
+        
     }
 
     /**
@@ -63,7 +67,9 @@ abstract class Model extends Db
         //transforme les champs en une seule chaine qui sera integrer dans la requete
         $strChamp = implode(' AND ', $champs);
 
-        return $this->runQuery("SELECT * FROM $this->table WHERE $strChamp", $valeurs)->fetchAll();
+        return $this->fetchHydrate(
+            $this->runQuery("SELECT * FROM $this->table WHERE $strChamp", $valeurs)->fetchAll()
+        ); 
     }
 
     /**
@@ -199,6 +205,22 @@ abstract class Model extends Db
             } 
         }
         return $this;
+    }
+
+    public function fetchHydrate(mixed $query): array|static|bool 
+    {
+        if(is_array($query) && count($query) > 1) {
+            $data = array_map(function(object $value): static {
+                return (new static())->hydrate($value);
+            }, $query);
+
+            return $data;
+        } else if(!empty($query)) {
+            return (new static())->hydrate($query);
+        }
+
+        return $query;
+        
     }
     
 }
