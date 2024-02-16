@@ -14,12 +14,15 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
-                    <?php if(!empty($_SESSION['LOGGED_USER'])): ?>
+                    <?php if (!empty($_SESSION['LOGGED_USER'])) : ?>
                         <li class="nav-item">
                             <a href="/logout" class="btn btn-danger">Deconnexion</a>
                         </li>
                     <?php else : ?>
                         <li class="nav-item">
+                            <a href="/register" class="btn btn-light">S'inscrire</a>
+                        </li>
+                        <li class="nav-item ms-2">
                             <a href="/login" class="btn btn-light">Connexion</a>
                         </li>
                     <?php endif; ?>

@@ -6,6 +6,7 @@ use App\Core\Route;
 use App\Models\User;
 use App\Form\LoginForm;
 use App\Core\Controller;
+use App\Form\UserForm;
 
 class SecurityController extends Controller
 {
@@ -44,5 +45,47 @@ class SecurityController extends Controller
         http_response_code(302);
         header("Location: /");
         exit();
+    }
+
+    #[Route('app.register', '/register', ['GET', 'POST'])]
+    public function register(): void
+    {
+        $form = new UserForm('/register');
+
+        if($form->validate(['nom', 'prenom', 'email', 'password'], $_POST)) {
+            $nom = strip_tags($_POST['nom']);
+            $prenom = strip_tags($_POST['prenom']);
+            $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+            $password = password_hash($_POST['password'], PASSWORD_ARGON2I);
+
+            if($email) {
+                $user = (new User)->findOneByEmail($email);
+                if(!$user) {
+                    $user = new User;
+                    $user
+                        ->setPrenom($prenom)
+                        ->setNom($nom)
+                        ->setEmail($email)
+                        ->setPassword($password)
+                        ->create();
+
+                        $_SESSION['messages']['success'] = "Vous êtes incrit à l'application";
+                        http_response_code(302);
+                        header('Location: /login');
+                        exit();
+                } else {
+                    $_SESSION['messages']['danger'] = "L'email est déjà utilisé par un autre compte";
+                }
+
+            } else {
+                $_SESSION['messages']['danger'] = 'Veuillez renseigner un email valide';
+            }
+        }
+        $this->render('Security/register.php', [
+            'meta' => [
+                'title' => 'S\'inscrire',
+            ],
+            'form' => $form->createForm(),     
+            ]);
     }
 }
