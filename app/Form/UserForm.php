@@ -3,10 +3,11 @@
 namespace App\Form;
 
 use App\Core\Form;
+use App\Models\User;
 
 class UserForm extends Form
 {
-    public function __construct(string $action)
+    public function __construct(string $action, ?User $user = null)
         
     {
         $this
@@ -19,7 +20,8 @@ class UserForm extends Form
                 'class' => 'form-control',
                 'id' => 'nom',
                 'required' => true,
-                'placeholder' => 'Wayne'
+                'placeholder' => 'Wayne',
+                'value' => $user ? $user->getNom() : null,
             ])
             ->endDiv()
             ->startDiv(['class' => 'mb-3'])
@@ -28,7 +30,8 @@ class UserForm extends Form
                 'class' => 'form-control',
                 'id' => 'prenom',
                 'required' => true,
-                'placeholder' => 'Bruce'
+                'placeholder' => 'Bruce',
+                'value' => $user ? $user->getPrenom() : null,
             ])
             ->endDiv()
             ->startDiv(['class' => 'mb-3'])
@@ -37,7 +40,8 @@ class UserForm extends Form
                 'class' => 'form-control',
                 'id' => 'email',
                 'required' => true,
-                'placeholder' => 'batman@justiceleague.com'
+                'placeholder' => 'batman@justiceleague.com',
+                'value' => $user ? $user->getEmail() : null,
             ])
             ->endDiv()
             ->startDiv(['class' => 'mb-3'])
@@ -45,16 +49,51 @@ class UserForm extends Form
             ->addInput('password', 'password', [
                 'class' => 'form-control',
                 'id' => 'password',
-                'required' => true,
+                'required' => $user ? false : true,
                 'placeholder' => 'S3CR3T'
             ])
-            ->endDiv()
-            ->startDiv(['class' => 'text-center'])
-            ->addButton('S\'inscrire', [
+            ->endDiv();
+
+            if($user) {
+                $this
+                    ->startDiv(['class' => 'mb-3'])
+                    ->addLabel('roles[]', 'Roles :', ['class' => 'form-label'])
+                    ->addSelect('roles[]',
+                        [
+                            'ROLE_USER' => [
+                                'label' => 'Utilisateur',
+                                'attributs' => [
+                                    'selected' => true,
+                                ]
+                            ],
+                            'ROLE_EDITOR' => [
+                                'label' => 'Editeur',
+                                'attributs' => [
+                                    'selected' => in_array('ROLE_EDITOR', $user->getRoles()) ? true : false,
+                                ]
+                            ],
+                            'ROLE_ADMIN' => [
+                                'label' => 'Administrateur',
+                                'attributs' => [
+                                    'selected' => in_array('ROLE_ADMIN', $user->getRoles()) ? true : false,
+                                ]
+                            ]
+                            ],
+                            [
+                                'class' => 'form-control',
+                                'id' => 'roles[]',
+                                'multiple' => true,
+                            ])
+                    ->endDiv();
+            }
+
+            $this
+                ->startDiv(['class' => 'text-center'])
+                ->addButton($user ? 'Modifier' : 'S\'inscrire', [
                 'class' => 'btn btn-primary mt-3',
                 'type' => 'submit',
             ])
-            ->endDiv()
-            ->endForm();
+                ->endDiv()
+                ->endForm();
     }
 }

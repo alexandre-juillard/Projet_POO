@@ -37,7 +37,7 @@ abstract class Model extends Db
      * fct pour chercher une entrée par son id
      *
      * @param integer $id
-     * @return static/boolean
+     * @return static|boolean
      */
     public function find(int $id): static|bool
     {
@@ -209,7 +209,7 @@ abstract class Model extends Db
 
     public function fetchHydrate(mixed $query): array|static|bool 
     {
-        if(is_array($query) && count($query) > 1) {
+        if(is_array($query)) {
             $data = array_map(function(object $value): static {
                 return (new static())->hydrate($value);
             }, $query);

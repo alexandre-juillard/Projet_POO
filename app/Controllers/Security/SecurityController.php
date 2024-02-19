@@ -18,7 +18,7 @@ class SecurityController extends Controller
         if ($form->validate(['email', 'password'], $_POST)) {
             $user = (new User())->findOneByEmail($_POST['email']);
 
-            if ($user && password_verify($_POST['password'], $user['password'])) {
+            if ($user && password_verify($_POST['password'], $user->getPassword())) {
 
                 $user->connect();
 
