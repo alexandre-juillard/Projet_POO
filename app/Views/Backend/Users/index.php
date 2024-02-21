@@ -1,5 +1,6 @@
 <section class="mt-4 container">
     <h1 class="text-center">Administration des Users</h1>
+    <a href="/register" class="btn btn-primary mb-3">Créer un utilisateur</a>
     <div class="row gy-3">
         <?php foreach($users as $user) : ?>
             <div class="col-4">

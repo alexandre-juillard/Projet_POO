@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Db;
+use DateTime;
 use PDOStatement;
 
 abstract class Model extends Db
@@ -29,9 +30,9 @@ abstract class Model extends Db
     public function findAll(): array
     {
         return $this->fetchHydrate(
-            $this->runQuery("SELECT * FROM $this->table")->fetchAll());
-        
-    }   
+            $this->runQuery("SELECT * FROM $this->table")->fetchAll()
+        );
+    }
 
     /**
      * fct pour chercher une entrée par son id
@@ -42,8 +43,8 @@ abstract class Model extends Db
     public function find(int $id): static|bool
     {
         return $this->fetchHydrate(
-            $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch());
-        
+            $this->runQuery("SELECT * FROM $this->table WHERE id = :id", ['id' => $id])->fetch()
+        );
     }
 
     /**
@@ -59,7 +60,7 @@ abstract class Model extends Db
         $valeurs = [];
 
         //Faire une boucle sur tableau de filtre
-        foreach($filters as $key =>$value) {
+        foreach ($filters as $key => $value) {
             $champs[] = "$key = :$key";
             $valeurs[$key] = $value;
         }
@@ -69,7 +70,7 @@ abstract class Model extends Db
 
         return $this->fetchHydrate(
             $this->runQuery("SELECT * FROM $this->table WHERE $strChamp", $valeurs)->fetchAll()
-        ); 
+        );
     }
 
     /**
@@ -84,30 +85,31 @@ abstract class Model extends Db
         $markers = [];
         $valeurs = [];
 
-        foreach($this as $key => $value){
+        foreach ($this as $key => $value) {
             //filtre les infos qu'on récupère, enleve la table et database et valeurs non remplies
-            if($key != 'table' && $key != 'database' && !empty($value)) {
-            
+            if ($key != 'table' && $key != 'database' && $value !== null) {
+
                 //stocke les infos dans variables sous forme de tableau
                 $champs[] = "$key";
                 $markers[] = ":$key";
 
                 //si $value est un tableau, on transforme en json pour etre lu par bdd
-                if(is_array($value))
-                {
+                if (is_array($value)) {
                     $valeurs[$key] = json_encode($value);
-
+                } else if ($value instanceof DateTime) {
+                    $valeurs[$key] = $value->format('Y-m-d H:i:s');
+                } else if (is_bool($value)) {
+                    $valeurs[$key] = (int) $value;
                 } else {
                     $valeurs[$key] = $value;
                 }
-                
             }
         }
         // transforme infos de tableau en une seule chaine
         $strChamp = implode(', ', $champs);
         $strMarker = implode(', ', $markers);
-       
-        return $this->runQuery("INSERT INTO $this->table($strChamp) VALUES ($strMarker)", $valeurs);  
+
+        return $this->runQuery("INSERT INTO $this->table($strChamp) VALUES ($strMarker)", $valeurs);
     }
 
     /**
@@ -118,22 +120,24 @@ abstract class Model extends Db
     public function update(): PDOStatement|bool
     {
         //UPDATE $this->table SET nom = :nom, prenom = :prenom WHERE id = :id
-        
+
         $champs = [];
         $valeurs = [];
 
-        foreach($this as $key => $value) {
-            if($key != 'table' && $key != 'database' && $key != 'id' && !empty($value) ) {
+        foreach ($this as $key => $value) {
+            if ($key != 'table' && $key != 'database' && $key != 'id' && $value !== null) {
                 $champs[] = "$key = :$key";
-                
-                if(is_array($value))
-                {
-                    $valeurs[$key] = json_encode($value);
 
+                if (is_array($value)) {
+                    $valeurs[$key] = json_encode($value);
+                } else if ($value instanceof DateTime) {
+                    $valeurs[$key] = $value->format('Y-m-d H:i:s');
+                } else if (is_bool($value)) {
+                    $valeurs[$key] = (int) $value;
                 } else {
                     $valeurs[$key] = $value;
                 }
-            }     
+            }
         }
         //commentaire qui indique a vscode d'ou vient id car il existe pas dans classe Model
         /**
@@ -143,7 +147,6 @@ abstract class Model extends Db
 
         $strChamp = implode(',', $champs);
         return $this->runQuery("UPDATE $this->table SET $strChamp WHERE id = :id", $valeurs);
-
     }
 
     /**
@@ -183,7 +186,7 @@ abstract class Model extends Db
         return $query;
     }
 
-   
+
 
     /**
      * fct qui prerempli les données sous forme d'objet pour automatiser apport de données(evite d ecrire les setter)
@@ -194,33 +197,33 @@ abstract class Model extends Db
     public function hydrate(array|object $data): static
     {
         //automatisation des setter dynamiquement (nom devient setNom($value)), transforme un tableau en objet
-        foreach($data as $key => $value) {
+        foreach ($data as $key => $value) {
             $setter = 'set' . ucfirst($key);
 
             //patch pour faire fct meme si roles est vide
-            if($key === 'roles'){
+            if ($key === 'roles') {
                 $this->$setter($value ? json_decode($value) : null);
+            } else if ($key === 'createdAt' || $key === 'updatedAt' && $value) {
+                $this->$setter(new DateTime($value));
             } else {
                 $this->$setter($value);
-            } 
+            }
         }
         return $this;
     }
 
-    public function fetchHydrate(mixed $query): array|static|bool 
+    public function fetchHydrate(mixed $query): array|static|bool
     {
-        if(is_array($query)) {
-            $data = array_map(function(object $value): static {
+        if (is_array($query)) {
+            $data = array_map(function (object $value): static {
                 return (new static())->hydrate($value);
             }, $query);
 
             return $data;
-        } else if(!empty($query)) {
+        } else if (!empty($query)) {
             return (new static())->hydrate($query);
         }
 
         return $query;
-        
     }
-    
 }

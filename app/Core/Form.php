@@ -88,6 +88,17 @@ abstract class Form
         return $this;
     }
 
+    public function addTextArea(string $name, ?string $value = null, array $attributs = [], int $rows = 10, int $cols = 20): self 
+    {
+        $this->formCode .= "<textarea name=\"$name\" rows=\"$rows\" cols=\"$cols\"";
+
+        $this->formCode .= $attributs ? $this->addAttributs($attributs) . '>' : '>';
+
+        $this->formCode .= "$value</textarea>";
+
+        return $this;
+    }
+
     /**
      * ajoute attributs dans elements html
      * Tableau associatif exemple ['class' => 'form-control', 'id' => 'password']
@@ -99,7 +110,7 @@ abstract class Form
     {
         $str = "";
 
-        $courts = ['checked', 'selected', 'required', 'disabled', 'multiple', 'readonly', 'novalidate', 'formnovalidate'];
+        $courts = ['checked', 'selected', 'required', 'disabled', 'multiple', 'readonly', 'novalidate', 'formnovalidate', 'wrap'];
 
         //boucle sur les attributs html du tableau
         foreach ($attributs as $name => $value) {

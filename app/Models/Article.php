@@ -14,9 +14,30 @@ class Article extends Model
         protected ?DateTime $createdAt = null,
         protected ?DateTime $updatedAt = null,
         protected ?bool $actif = null,
+        protected ?int $userId = null,
     )
     {
         $this->table = "articles";
+    }
+
+    public function getOneAuthorByArticle(): string 
+    {
+        $user = $this->runQuery(
+                        "SELECT u.prenom, u.nom 
+                        FROM $this->table a 
+                        JOIN users u ON a.userId = u.id 
+                        WHERE a.id = :articleId",
+                         ['articleId' => $this->id])->fetch()
+        ;
+        return "$user->prenom $user->nom";
+    }
+
+    public function findOneByTitre(string $titre): self|bool
+    {
+        return $this->fetchHydrate(
+                $this->runQuery("SELECT * FROM $this->table 
+                WHERE titre = :titre", ['titre' => $titre])->fetch()
+        );
     }
 
         /**
@@ -159,6 +180,30 @@ class Article extends Model
         public function setActif(?bool $actif): self
         {
                 $this->actif = $actif;
+
+                return $this;
+        }
+
+        /**
+         * Get the value of userId
+         *
+         * @return ?int
+         */
+        public function getUserId(): ?int
+        {
+                return $this->userId;
+        }
+
+        /**
+         * Set the value of userId
+         *
+         * @param ?int $userId
+         *
+         * @return self
+         */
+        public function setUserId(?int $userId): self
+        {
+                $this->userId = $userId;
 
                 return $this;
         }
