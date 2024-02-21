@@ -1,11 +1,15 @@
 <section class="mt-4 container">
     <h1 class="textcenter">Administration des articles</h1>
+    <a href="/admin/articles/create" class="btn btn-primary mt-3">Créer un article</a>
     <div class="mt-2 row gy-3">
         <?php foreach ($articles as $article) : ?>
             <div class="col-md-4">
                 <div class="card text-white <?= $article->getActif() ? "bg-success" : "bg-secondary"; ?>">
-                    <h2 class="card-header"><?= $article->getTitre(); ?></h2>
+                    <?php if ($article->getImageName()) : ?>
+                        <img src="/images/articles/<?= $article->getImageName(); ?>" class="img-fluid rounded-top" loading="lazy" alt="<?= $article->getTitre(); ?>">
+                    <?php endif; ?>
                     <div class="card-body">
+                        <h2 class="card-text text-center"><?= $article->getTitre(); ?></h2>
                         <p class="card-text">Créé le : <em><?= ($article->getCreatedAt())->format('d-m-Y'); ?></em></p>
                         <p class="card-text">Par : <em><?= $article->getOneAuthorByArticle(); ?></em></p>
                         <p class="card-text"><?= substr($article->getDescription(), 0, 20); ?>...</p>

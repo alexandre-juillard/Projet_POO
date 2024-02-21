@@ -125,6 +125,15 @@ abstract class Form
         return $str;
     }
 
+    public function addImage(string $src, array $attributs = []): self 
+    {
+        $this->formCode .= "<img src=\"$src\"";
+
+        $this->formCode .= $attributs ? $this->addAttributs($attributs) . '>' : '>';
+
+        return $this;
+    }
+
     public static function validate(array $champs, array $form): bool
     {
         //boucle sur tableau de champs obligatoires

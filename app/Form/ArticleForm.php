@@ -11,7 +11,8 @@ class ArticleForm extends Form
     {
         $this
         ->startForm($action, 'POST', [
-            'class' => 'form card p-3 w-75 mx-auto bg-light'
+            'class' => 'form card p-3 w-75 mx-auto bg-light',
+            'enctype' => 'multipart/form-data',
         ])
         ->startDiv(['class' => 'mb-3'])
         ->addLabel('titre', 'Titre :', ['class' => 'form-label'])
@@ -31,6 +32,17 @@ class ArticleForm extends Form
             'placeholder' => 'Ma description ici...',
             'wrap' => true,
             'value' => $article ? $article->getDescription() : null,
+        ])
+        ->endDiv()
+        ->startDiv(['class' => 'mb-3'])
+        ->addLabel('image', 'Image :', ['class' => 'form-label'])
+        ->addInput('file', 'image', [
+            'id' =>'image',
+            'class' => 'form-control'
+        ])
+        ->addImage($article->getImageName() ? "/images/articles/{$article->getImageName()}" : "", [
+            'class' => "img-fluid rounded mt-2",
+            'loading' => "lazy",
         ])
         ->endDiv()
         ->startDiv(['class' => 'mb-3 form-check'])
