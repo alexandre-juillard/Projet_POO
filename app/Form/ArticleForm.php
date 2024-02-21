@@ -40,7 +40,7 @@ class ArticleForm extends Form
             'id' =>'image',
             'class' => 'form-control'
         ])
-        ->addImage($article->getImageName() ? "/images/articles/{$article->getImageName()}" : "", [
+        ->addImage($article && $article->getImageName() ? "/images/articles/{$article->getImageName()}" : " ", [
             'class' => "img-fluid rounded mt-2",
             'loading' => "lazy",
         ])

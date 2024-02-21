@@ -13,7 +13,12 @@
                         <p class="card-text">Créé le : <em><?= ($article->getCreatedAt())->format('d-m-Y'); ?></em></p>
                         <p class="card-text">Par : <em><?= $article->getOneAuthorByArticle(); ?></em></p>
                         <p class="card-text"><?= substr($article->getDescription(), 0, 20); ?>...</p>
-                        <p class="card-text">Actif : <?= $article->getActif() ? "Oui" : "Non"; ?></p>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="switch-enable-article-<?= $article->getId();?>" <?= $article->getActif() ? 'checked' : null;?> data-switch-article-id="<?= $article->getId(); ?>"/>
+                            <label class="form-check-label" for="switch-enable-article-<?= $article->getId();?>">Actif</label>
+                        </div>
+
                         <div class="d-flex justify-content-between flex-wrap">
                             <a href="/admin/articles/<?= $article->getId(); ?>/edit" class="btn btn-warning">Modifier</a>
                             <form action="/admin/articles/<?= $article->getId(); ?>/delete" method="POST" onsubmit="return confirm('Voulez vous supprimer cet article?')">
