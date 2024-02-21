@@ -41,6 +41,16 @@ class Article extends Model
         );
     }
 
+    public function findActifArticleByDate(bool $actif = true): array 
+    {
+        return $this->fetchHydrate(
+                $this->runQuery("SELECT * FROM $this->table 
+                        WHERE actif = :actif 
+                        ORDER BY createdAt DESC",
+                         ['actif' => $actif])->fetchAll()
+        );
+    }
+
         /**
          * Get the value of id
          *

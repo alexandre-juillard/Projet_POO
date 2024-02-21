@@ -16,8 +16,20 @@ class ArticleController extends Controller
         $this->render('Frontend/Articles/show.php', [
             'article' => $article,
             'meta' => [
-                'title' => $article['titre'],
+                'title' => $article->getTitre(),
             ]
+        ]);
+    }
+
+    #[Route('app.article.index', '/articles', ['GET'])]
+    public function index(): void
+    {
+        
+        $this->render('Frontend/Articles/index.php', [
+            'meta' => [
+                'title' => 'Liste des articles en ligne',
+            ],
+            'articles' => (new Article)->findActifArticleByDate(true),
         ]);
     }
 }
