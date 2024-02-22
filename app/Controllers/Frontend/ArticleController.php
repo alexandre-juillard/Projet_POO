@@ -11,14 +11,24 @@ class ArticleController extends Controller
     #[Route('app.article.show', '/articles/details/([0-9]+)', ['GET'])]
     public function show(int $id): void
     {
-        $article = (new Article)->find($id);
+        $article = (new Article)->findOneActifById($id);
 
-        $this->render('Frontend/Articles/show.php', [
+        if(!$article) {
+            $_SESSION['messages']['danger'] = "Cet article n'est pas trouvé";
+
+            http_response_code(302);
+            header('Location: /articles');
+            exit();
+        } 
+             $this->render('Frontend/Articles/show.php', [
             'article' => $article,
             'meta' => [
                 'title' => $article->getTitre(),
+                'css' => [
+                    '/css/showArticle.css'
+                ],
             ]
-        ]);
+        ]);    
     }
 
     #[Route('app.article.index', '/articles', ['GET'])]

@@ -41,6 +41,15 @@ class Article extends Model
         );
     }
 
+    public function findOneActifById(int $id): bool|self 
+    {
+        return $this->fetchHydrate(
+                $this->runQuery("SELECT * FROM $this->table 
+                WHERE actif = true AND id = :id",
+                ['id' => $id])->fetch()
+        );
+    }
+
     public function findActifArticleByDate(bool $actif = true): array 
     {
         return $this->fetchHydrate(
