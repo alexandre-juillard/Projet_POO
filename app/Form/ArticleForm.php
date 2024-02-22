@@ -23,7 +23,19 @@ class ArticleForm extends Form
             'placeholder' => 'Mon titre ici',
             'value' => $article ? $article->getTitre() : null,
         ])
-        ->endDiv()
+        ->endDiv();
+
+        if($article) {
+            $this
+                ->startDiv(['class' => 'mt-3'])
+                ->addLabel('categorie', 'Catégorie :', ['class' => 'form-label'])
+                ->addSelect('categorie', 
+
+                )
+                ->endDiv() 
+        };
+        $this
+        
         ->startDiv(['class' => 'mb-3'])
         ->addLabel('description', 'Description :', ['class' => 'form-label'])
         ->addTextArea('description', $article ? $article->getDescription() : null, [

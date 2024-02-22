@@ -28,6 +28,8 @@
                                         <a class="dropdown-item" href="/admin/users">Users</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="/admin/articles">Articles</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="/admin/categories">Catégories</a>
                                     </div>
                                 </div>
 

@@ -13,9 +13,29 @@ class Categorie extends Model
         protected ?DateTime $createdAt = null,
         protected ?DateTime $updatedAt = null,
         protected ?bool $actif = null,
+        protected ?string $imageName = null,
     )
     {
         $this->table = "categories";
+    }
+
+    public function findOneByNom(string $nom): self|bool
+    {
+        return $this->fetchHydrate(
+            $this->runQuery("SELECT * FROM $this->table
+            WHERE nom = :nom", ['nom' => $nom])->fetch()
+        );
+    }
+
+    public function findAllCategoriesForSelect(): array
+    {
+        $results = $this->fetchHydrate(
+            $this->runQuery("SELECT * FROM $this->table")->fetchAll()
+        );
+
+        foreach($results as $result) {
+            
+        }
     }
 
         /**
@@ -134,6 +154,30 @@ class Categorie extends Model
         public function setActif(?bool $actif): self
         {
                 $this->actif = $actif;
+
+                return $this;
+        }
+
+        /**
+         * Get the value of imageName
+         *
+         * @return ?string
+         */
+        public function getImageName(): ?string
+        {
+                return $this->imageName;
+        }
+
+        /**
+         * Set the value of imageName
+         *
+         * @param ?string $imageName
+         *
+         * @return self
+         */
+        public function setImageName(?string $imageName): self
+        {
+                $this->imageName = $imageName;
 
                 return $this;
         }

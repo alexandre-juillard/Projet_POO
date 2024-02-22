@@ -16,6 +16,7 @@ class Article extends Model
         protected ?bool $actif = null,
         protected ?int $userId = null,
         protected ?string $imageName = null,
+        protected ?int $categorieId = null,
     )
     {
         $this->table = "articles";
@@ -58,6 +59,18 @@ class Article extends Model
                         ORDER BY createdAt DESC",
                          ['actif' => $actif])->fetchAll()
         );
+    }
+
+    public function findCategorieByArticle(): string
+    {
+        $categorie = $this->runQuery("SELECT c.nom 
+                FROM $this->table a
+                JOIN categories c ON c.id = a.categorieId
+                WHERE a.id = :articleId",
+                ['articleId' => $this->id])->fetch();
+        
+
+        return "$categorie.nom";
     }
 
         /**
@@ -248,6 +261,30 @@ class Article extends Model
         public function setImageName(?string $imageName): self
         {
                 $this->imageName = $imageName;
+
+                return $this;
+        }
+
+        /**
+         * Get the value of categorieId
+         *
+         * @return ?int
+         */
+        public function getCategorieId(): ?int
+        {
+                return $this->categorieId;
+        }
+
+        /**
+         * Set the value of categorieId
+         *
+         * @param ?int $categorieId
+         *
+         * @return self
+         */
+        public function setCategorieId(?int $categorieId): self
+        {
+                $this->categorieId = $categorieId;
 
                 return $this;
         }
