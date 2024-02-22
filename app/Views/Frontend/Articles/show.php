@@ -10,6 +10,7 @@
             <h2 class="mb-3"><?= $article->getTitre(); ?></h2>
             <p><strong>Date : </strong><?= ($article->getCreatedAt())->format('d-m-Y'); ?></p>
             <p><strong>Par : </strong><?= $article->getOneAuthorByArticle(); ?></p>
+            <p><strong>Catégorie : </strong><?= $article->findCategorieByArticle(); ?></p>
         </aside>
         <div class="col-md-9">
             <p><?= nl2br($article->getDescription()); ?></p>

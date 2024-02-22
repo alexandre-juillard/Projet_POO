@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Core\Form;
 use App\Models\Article;
+use App\Models\Categorie;
 
 class ArticleForm extends Form 
 {
@@ -29,11 +30,14 @@ class ArticleForm extends Form
             $this
                 ->startDiv(['class' => 'mt-3'])
                 ->addLabel('categorie', 'Catégorie :', ['class' => 'form-label'])
-                ->addSelect('categorie', 
+                ->addSelect('categorie', (new Categorie)->findAllCategoriesForSelect(), [
+                    'class' => 'form-control',
+                    'id' => 'categorie',        
+                ]
 
                 )
-                ->endDiv() 
-        };
+                ->endDiv();
+        }
         $this
         
         ->startDiv(['class' => 'mb-3'])

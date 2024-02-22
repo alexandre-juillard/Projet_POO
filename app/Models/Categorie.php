@@ -34,7 +34,14 @@ class Categorie extends Model
         );
 
         foreach($results as $result) {
-            
+            [$this->getNom() => [
+                'label' => $this->getNom(),
+                //si categorieId dans l'article = id de l'objet categorie
+                'selected' => ((new Article)->getCategorieId() === $this->getId()) ? true : false,
+            ]
+            ];
+
+            return $result;
         }
     }
 
