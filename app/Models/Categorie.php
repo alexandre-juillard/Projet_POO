@@ -61,6 +61,34 @@ class Categorie extends Model
                 return $choices;
         }
 
+        public function findAllForSelect(null|Produit|Article $object = null): array
+        {
+                $categories = $this->findAllActiveOrderByName();
+
+                $choices = [];
+
+                $choices[0] = [
+                        'label' => 'Sélectionner une catégorie',
+                        'attributs' => [
+                                'selected' => !$object ? true : false,
+                                'disabled' => true,
+                        ]
+                ];
+
+                foreach ($categories as $categorie) {
+                        $choices[$categorie->getId()] = [
+                                'label' => $categorie->getNom(),
+                                'attributs' => [
+                                        'selected' => ($object && $object->getCategorieId() === $categorie->getId()) ? true : false,
+                                ]
+                                //si categorieId dans l'article = id de l'objet categorie
+
+                        ];
+                }
+
+                return $choices;
+        }
+
         /**
          * Get the value of id
          *

@@ -1,5 +1,5 @@
 <section class="mt-4 container">
-    <h1 class="textcenter">Administration des articles</h1>
+    <h1 class="text-center">Administration des articles</h1>
     <a href="/admin/articles/create" class="btn btn-primary mt-3">Créer un article</a>
     <div class="mt-2 row gy-3">
         <?php foreach ($articles as $article) : ?>

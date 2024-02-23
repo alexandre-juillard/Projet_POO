@@ -179,7 +179,6 @@ class ArticleController extends Controller
                 'status' => 'error',
                 'message' => 'Article non trouvé',
             ]);
-        }
-        
+        } 
     }
 }
