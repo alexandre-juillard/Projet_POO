@@ -7,43 +7,59 @@ use App\Models\Model;
 
 class Categorie extends Model
 {
-    public function __construct(
-        protected ?int $id = null,
-        protected ?string $nom = null,
-        protected ?DateTime $createdAt = null,
-        protected ?DateTime $updatedAt = null,
-        protected ?bool $actif = null,
-        protected ?string $imageName = null,
-    )
-    {
-        $this->table = "categories";
-    }
-
-    public function findOneByNom(string $nom): self|bool
-    {
-        return $this->fetchHydrate(
-            $this->runQuery("SELECT * FROM $this->table
-            WHERE nom = :nom", ['nom' => $nom])->fetch()
-        );
-    }
-
-    public function findAllCategoriesForSelect(): array
-    {
-        $results = $this->fetchHydrate(
-            $this->runQuery("SELECT * FROM $this->table")->fetchAll()
-        );
-
-        foreach($results as $result) {
-            [$this->getNom() => [
-                'label' => $this->getNom(),
-                //si categorieId dans l'article = id de l'objet categorie
-                'selected' => ((new Article)->getCategorieId() === $this->getId()) ? true : false,
-            ]
-            ];
-
-            return $result;
+        public function __construct(
+                protected ?int $id = null,
+                protected ?string $nom = null,
+                protected ?DateTime $createdAt = null,
+                protected ?DateTime $updatedAt = null,
+                protected ?bool $actif = null,
+                protected ?string $imageName = null,
+        ) {
+                $this->table = "categories";
         }
-    }
+
+        public function findOneByNom(string $nom): self|bool
+        {
+                return $this->fetchHydrate(
+                        $this->runQuery("SELECT * FROM $this->table
+            WHERE nom = :nom", ['nom' => $nom])->fetch()
+                );
+        }
+
+        public function findAllActiveOrderByName(bool $actif = true): array
+        {
+                return $this->fetchHydrate(
+                        $this->runQuery("SELECT * FROM $this->table WHERE actif = :actif ORDER BY nom ASC", ['actif' => $actif])->fetchAll()
+                );
+        }
+
+        public function findAllCategoriesForSelect(?Article $article = null): array
+        {
+                $categories = $this->findAllActiveOrderByName();
+
+                $choices = [];
+
+                $choices[0] = [
+                        'label' => 'Sélectionner une catégorie',
+                        'attributs' => [
+                                'selected' => !$article ? true : false,
+                                'disabled' => true,
+                        ]
+                ];
+
+                foreach ($categories as $categorie) {
+                        $choices[$categorie->getId()] = [
+                                'label' => $categorie->getNom(),
+                                'attributs' => [
+                                        'selected' => ($article && $article->getCategorieId() === $categorie->getId()) ? true : false,
+                                ]
+                                //si categorieId dans l'article = id de l'objet categorie
+
+                        ];
+                }
+
+                return $choices;
+        }
 
         /**
          * Get the value of id

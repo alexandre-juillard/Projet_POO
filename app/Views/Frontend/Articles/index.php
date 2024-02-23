@@ -9,7 +9,7 @@
                     <?php endif; ?>
                     <div class="card-body">
                         <h2 class="card-text text-center"><?= $article->getTitre(); ?></h2>
-                        <p class="card-text">Catégorie : <strong><?= $article->findCategorieByArticle(); ?></strong></p>
+                        <p class="card-text <?= $article->findCategorieByArticle() ? 'badge bg-primary' : null; ?><?= $article->findCategorieByArticle(); ?></p>
                         <p class="card-text">Créé le : <em><?= ($article->getCreatedAt())->format('d-m-Y'); ?></em></p>
                         <p class="card-text">Par : <em><?= $article->getOneAuthorByArticle(); ?></em></p>
                         <p class="card-text"><?= substr($article->getDescription(), 0, 20); ?>...</p>

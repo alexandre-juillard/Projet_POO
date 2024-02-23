@@ -41,6 +41,8 @@ class ArticleController extends Controller
             $description = strip_tags($_POST['description']);
             $actif = isset($_POST['actif']) ? true : false;
             $imageName = !empty($_FILES['image']) ? (new Article)->uploadImage($_FILES['image']) : null;
+            $categorieId = (int) $_POST['categorie'] > 0 ? (int) $_POST['categorie'] : null ;
+
 
             $article = (new Article)->findOneByTitre($titre);
 
@@ -51,6 +53,7 @@ class ArticleController extends Controller
                     ->setActif($actif)
                     ->setUserId($_SESSION['LOGGED_USER']['id'])
                     ->setImageName($imageName)
+                    ->setCategorieId($categorieId)
                     ->create();
 
                 $_SESSION['messages']['success'] = "Article créé avec succès";
@@ -93,6 +96,7 @@ class ArticleController extends Controller
             $description = strip_tags($_POST['description']);
             $actif = isset($_POST['actif']) ? true : false;
             $imageName = !empty($_FILES['image']) ? (new Article)->uploadImage($_FILES['image']) : null;
+            $categorieId = (int) $_POST['categorie'] > 0 ? (int) $_POST['categorie'] : null ;
 
             $oldTitre = $article->getTitre();
 
@@ -105,6 +109,7 @@ class ArticleController extends Controller
                         ->setActif($actif)
                         ->setUpdatedAt(new DateTime)
                         ->setImageName($imageName)
+                        ->setCategorieId($categorieId)
                         ->update();
 
                     // var_dump($article);

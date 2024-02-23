@@ -24,22 +24,14 @@ class ArticleForm extends Form
             'placeholder' => 'Mon titre ici',
             'value' => $article ? $article->getTitre() : null,
         ])
-        ->endDiv();
-
-        if($article) {
-            $this
-                ->startDiv(['class' => 'mt-3'])
-                ->addLabel('categorie', 'Catégorie :', ['class' => 'form-label'])
-                ->addSelect('categorie', (new Categorie)->findAllCategoriesForSelect(), [
+        ->endDiv()
+        ->startDiv(['class' => 'mt-3'])
+        ->addLabel('categorie', 'Catégorie :', ['class' => 'form-label'])
+        ->addSelect('categorie', (new Categorie)->findAllCategoriesForSelect($article), [
                     'class' => 'form-control',
                     'id' => 'categorie',        
-                ]
-
-                )
-                ->endDiv();
-        }
-        $this
-        
+                ])
+        ->endDiv()
         ->startDiv(['class' => 'mb-3'])
         ->addLabel('description', 'Description :', ['class' => 'form-label'])
         ->addTextArea('description', $article ? $article->getDescription() : null, [

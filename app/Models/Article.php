@@ -61,7 +61,7 @@ class Article extends Model
         );
     }
 
-    public function findCategorieByArticle(): string
+    public function findCategorieByArticle(): ?string
     {
         $categorie = $this->runQuery("SELECT c.nom 
                 FROM $this->table a
@@ -69,8 +69,7 @@ class Article extends Model
                 WHERE a.id = :articleId",
                 ['articleId' => $this->id])->fetch();
         
-
-        return "$categorie.nom";
+        return $categorie ? $categorie->nom : null;
     }
 
         /**
